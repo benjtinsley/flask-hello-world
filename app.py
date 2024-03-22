@@ -28,15 +28,18 @@ def testing():
 def create_table():
     conn = psycopg2.connect("postgres://demo_flask_db_user:Btfg95mH0oYuk4dKUWJPQjCXuVAMVBfm@dpg-cnuul77109ks73ejf7pg-a.oregon-postgres.render.com/demo_flask_db")
     cur = conn.cursor()
-    cur.execute('''
-    CREATE TABLE IF NOT EXISTS Basketball(
-        First varchar(255),
-        Last varchar(255),
-        City varchar(255),
-        Name varchar(255),
-        Number int
-        );
-    ''')
+    try:
+        cur.execute('''
+        CREATE TABLE IF NOT EXISTS Basketball(
+            First varchar(255),
+            Last varchar(255),
+            City varchar(255),
+            Name varchar(255),
+            Number int
+            );
+        ''')
+    except Exception as e:
+        return navigation + 'Error: ' + str(e)
     conn.commit()
     conn.close()
     return navigation + 'Table "Basketball" Created Successfully'
@@ -44,15 +47,18 @@ def create_table():
 @app.route('/db_insert')
 def insert_data():
     conn = psycopg2.connect("postgres://demo_flask_db_user:Btfg95mH0oYuk4dKUWJPQjCXuVAMVBfm@dpg-cnuul77109ks73ejf7pg-a.oregon-postgres.render.com/demo_flask_db")
-    cur = conn.cursor()    
-    cur.execute('''
-    INSERT INTO Basketball (First, Last, City, Name, Number)
-    Values
-    ('Jayson', 'Tatum', 'Boston', 'Celtics', 0),
-    ('Stephen', 'Curry', 'San Francisco', 'Warriors', 30),
-    ('Nikola', 'Jokic', 'Denver', 'Nuggets', 15),
-    ('Kawhi', 'Leonard', 'Los Angeles', 'Clippers', 2);
-    ''')
+    cur = conn.cursor()
+    try:
+        cur.execute('''
+        INSERT INTO Basketball (First, Last, City, Name, Number)
+        Values
+        ('Jayson', 'Tatum', 'Boston', 'Celtics', 0),
+        ('Stephen', 'Curry', 'San Francisco', 'Warriors', 30),
+        ('Nikola', 'Jokic', 'Denver', 'Nuggets', 15),
+        ('Kawhi', 'Leonard', 'Los Angeles', 'Clippers', 2);
+        ''')
+    except Exception as e:
+        return navigation + 'Error: ' + str(e)
     conn.commit()
     conn.close()
     return navigation + 'Table "Basketball" Successfully Polulated'
@@ -61,30 +67,34 @@ def insert_data():
 def select_data():
     conn = psycopg2.connect("postgres://demo_flask_db_user:Btfg95mH0oYuk4dKUWJPQjCXuVAMVBfm@dpg-cnuul77109ks73ejf7pg-a.oregon-postgres.render.com/demo_flask_db")
     cur = conn.cursor()
-    if cur.rowcount == 0:
-        return navigation + 'Error: Table "Basketball" is Empty.'
-
-    cur.execute('''
-    SELECT * FROM Basketball;
-    ''')
-    records = cur.fetchall()
+    try:
+        cur.execute('''
+        SELECT * FROM Basketball;
+        ''')
+        records = cur.fetchall()
+        conn.close()
+        response = '<table>'
+        for record in records:
+            response += '<tr>'
+            for field in record:
+                response += '<td>' + str(field) + '</td>'
+            response += '</tr>'
+        response += '</table>'
+    except Exception as e:
+        return navigation + 'Error: ' + str(e)
     conn.close()
-    response = '<table>'
-    for record in records:
-        response += '<tr>'
-        for field in record:
-            response += '<td>' + str(field) + '</td>'
-        response += '</tr>'
-    response += '</table>'
     return navigation + response
 
 @app.route('/db_drop')
 def drop_table():
     conn = psycopg2.connect("postgres://demo_flask_db_user:Btfg95mH0oYuk4dKUWJPQjCXuVAMVBfm@dpg-cnuul77109ks73ejf7pg-a.oregon-postgres.render.com/demo_flask_db")
     cur = conn.cursor()
-    cur.execute('''
-    DROP TABLE Basketball;
-    ''')
+    try:
+        cur.execute('''
+        DROP TABLE Basketball;
+        ''')
+    except Exception as e:
+        return navigation + 'Error: ' + str(e)
     conn.commit()
     conn.close()
     return navigation + 'Table "Basketball" Successfully Dropped'
